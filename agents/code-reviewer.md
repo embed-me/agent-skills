@@ -4,7 +4,6 @@ description: >-
   security, and performance, then returns a verdict of APPROVE or REQUEST CHANGES with
   categorized, file-and-line findings. Read-only — it never fixes what it finds.
 mode: subagent
-model: deepseek/deepseek-v4-flash
 temperature: 0.1
 color: warning
 permission:

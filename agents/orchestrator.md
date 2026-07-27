@@ -4,7 +4,6 @@ description: >-
   delegates each to builder subagents, gates finished work through code-reviewer, and integrates
   the result. Use for any change that spans more than one file or one step.
 mode: primary
-model: deepseek/deepseek-v4-pro
 temperature: 0.1
 color: primary
 permission:

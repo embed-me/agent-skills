@@ -4,7 +4,6 @@ description: >-
   runs the suite and the build, commits. Use for any actual code change. Expects a brief with
   acceptance criteria; asks rather than guessing when the brief is ambiguous.
 mode: subagent
-model: deepseek/deepseek-v4-flash
 temperature: 0.1
 color: success
 permission:
