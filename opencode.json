@@ -6,7 +6,7 @@
   "subagent_depth": 1,
   "instructions": [
     "docs/definition-of-done.md",
-    "skills/using-agents-skills/SKILL.md"
+    "skills/using-agent-skills/SKILL.md"
   ],
   "formatter": true,
   "lsp": true,
