@@ -5,19 +5,25 @@ agent: hardware-tester
 
 Load the `hardware-test-execution` skill and follow it.
 
-Scope: $ARGUMENTS — what changed, plus the path to the artifact under test.
+Scope: $ARGUMENTS — what changed and what it was supposed to achieve on the device, the path to the
+artifact under test, and the path to the previous known-good artifact to baseline against.
 
-If the artifact cannot be uniquely identified, or the change is not described, stop and ask. Do
-not guess which build is on the bench, and do not infer the change from a filename.
+If the artifact cannot be uniquely identified, if the change is not described, or if the change is
+described without saying what should now be observably different on the device, stop and ask. Do
+not guess which build is on the bench, do not infer the change from a filename, and do not infer
+its intent. If no baseline was given, ask for it before recording that none exists.
 
-Record the bench before you start, and baseline the previous known-good artifact on it — or record
-that none exists. Write the scenarios down before you execute them, and give every failure a
-reproduction rate.
+Record the bench before you start — including the channels you will capture through and whether it
+can measure supply voltage and ambient temperature. Write the scenarios down as `SC-nn` before you
+execute them, run the one that demonstrates the change's intent first, start capture before it, and
+number every finding `HW-nn` with a reproduction rate.
 
-You report findings and change nothing in the artifact under test or the repository — not the
-source, the build flags, the project config, or the artifact. Bench stimulus and any device
-provisioning a scenario requires are allowed, recorded in the bench inventory and named in every
-finding they touch.
+You report findings and change nothing in the artifact under test or the repository. Bench stimulus
+and the device provisioning a scenario requires are the exception; the skill states the terms.
 
-Report: scenarios executed, findings by severity, what was not tested and why. End with an explicit
-verdict of PASS, FAIL, or BLOCKED.
+Stop and ask before anything irreversible: fuses, OTP, bootloader lock, readout protection, or any
+scenario whose recovery path is unproven. No harness rule gates these.
+
+Report: intent demonstrated or not, scenarios executed, findings by severity, what was not tested
+and why. End with an explicit verdict of PASS, FAIL, or BLOCKED — PASS only if the intent scenario
+showed the change doing what it was for.

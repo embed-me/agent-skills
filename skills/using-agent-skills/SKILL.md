@@ -42,7 +42,7 @@ spec-driven-development
   → planning-and-task-breakdown
     → incremental-implementation + test-driven-development   (per task, repeated)
       → code-review-and-quality                              (per task, gate)
-      + hardware-test-execution                              (also a gate, when hardware exists)
+      + hardware-test-execution                              (per artifact, gate, when hardware exists)
         → git-workflow-and-versioning                        (commit, tag, release)
 ```
 
