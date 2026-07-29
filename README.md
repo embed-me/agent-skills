@@ -24,6 +24,7 @@ downward only; skills never invoke agents.** No layer reaches sideways or upward
       │                             │
   /planning  /build  /review     free-form
   /test  /code-simplify          message
+  /hwtest
       │                             │
       └──────────────┬──────────────┘
                      ▼
@@ -61,6 +62,11 @@ of reporting it. The fix looks the same, but the finding vanishes — nobody lea
 the author never sees the mistake, and there is no record. Read-only is what makes it a gate
 rather than a second author.
 
+**The hardware tester is its own read-only role.** A green suite proves the logic, not the
+device — clock skew, brownouts, a flash sector that only fails warm, and every timing assumption
+the host mocked away are invisible to it. And a tester that can edit will make the bench pass
+instead of reporting that it does not, which is the one failure mode that leaves no trace.
+
 **Builders cannot spawn subagents.** `permission.task: deny`, plus `subagent_depth: 1` globally.
 Recursive delegation produces work nobody is tracking and cost nobody predicted.
 
@@ -85,6 +91,7 @@ plan is the leverage point; that is where the capable model belongs.
 | BUILD | `/build` | builder | `incremental-implementation` | code + commits |
 | VERIFY | `/test` | builder | `test-driven-development` | tests |
 | REVIEW | `/review` | code-reviewer | `code-review-and-quality` | verdict |
+| HARDWARE | `/hwtest` | hardware-tester | `hardware-test-execution` | findings + verdict |
 | SIMPLIFY | `/code-simplify` | builder | — | smaller diff |
 | SHIP | — | `/ship` | `git-workflow-and-versioning` | tag, changelog |
 
