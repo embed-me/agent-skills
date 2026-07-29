@@ -33,14 +33,14 @@ downward only; skills never invoke agents.** No layer reaches sideways or upward
         │  plans · delegates ·   │  cannot edit source
         │  sequences · integrates│
         └───────────┬────────────┘
-          ┌─────────┴─────────┬
-          ▼                   ▼
-    ┌───────────┐      ┌─────────────┐
-    │  BUILDER  │  ──▶ │CODE-REVIEWER│
-    │  edits    │  ◀── │  read-only  │
-    └───────────┘ REQUEST CHANGES
-          │              │
-          └──────┬───────┘
+          ┌─────────┴─────────┬─────────────────┐
+          ▼                   ▼                 ▼
+    ┌───────────┐      ┌─────────────┐  ┌───────────────┐
+    │  BUILDER  │  ──▶ │CODE-REVIEWER│  │HARDWARE-TESTER│
+    │  edits    │  ◀── │  read-only  │  │  read-only    │
+    └───────────┘ REQUEST CHANGES       └───────────────┘
+          │              │                      │
+          └──────┬───────┴──────────────────────┘
                  ▼
         skill tool → .opencode/skills/*/SKILL.md
                  │
@@ -91,9 +91,12 @@ plan is the leverage point; that is where the capable model belongs.
 | BUILD | `/build` | builder | `incremental-implementation` | code + commits |
 | VERIFY | `/test` | builder | `test-driven-development` | tests |
 | REVIEW | `/review` | code-reviewer | `code-review-and-quality` | verdict |
-| HARDWARE | `/hwtest` | hardware-tester | `hardware-test-execution` | findings + verdict |
 | SIMPLIFY | `/code-simplify` | builder | — | smaller diff |
+| HARDWARE | `/hwtest` | hardware-tester | `hardware-test-execution` | findings + verdict |
 | SHIP | — | `/ship` | `git-workflow-and-versioning` | tag, changelog |
+
+HARDWARE gates the artifact that ships, so it sits after the last phase that can still change code
+— re-run it after any change to the artifact.
 
 Commands are shortcuts, not the only path. Plain English works too — the routing table in
 `AGENTS.md` and the `using-agent-skills` router cover the same ground without a slash.

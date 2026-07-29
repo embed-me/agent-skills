@@ -7,7 +7,7 @@ description: >-
 license: MIT
 compatibility: opencode, claude-code, cursor, codex, any agent that can read a file
 metadata:
-  phase: validate
+  phase: hardware
 ---
 
 # Hardware Test Execution
@@ -30,9 +30,18 @@ interfaces. Without it you test at random, and random is the slowest coverage a 
 
 **The bench.** Whatever hardware is physically connected to the host. Inventory it in step 1.
 
-If any of the three is missing, or the artifact cannot be uniquely identified, **stop and ask.**
-Testing an unidentified binary produces findings nobody can act on: later, no one can tell whether
-the defect was in that build, an older one, or a file that no longer exists.
+**The baseline artifact, when one exists.** The previous known-good build, for the comparison in
+step 2. Conditional: a first release has none, and neither does a project that kept nothing. Do not
+build one yourself — step 2 says what to do instead.
+
+A missing or unidentifiable **artifact**, or a missing description of **what changed**, is
+**stop and ask** — nothing can be planned without them. Testing an unidentified binary produces
+findings nobody can act on: later, no one can tell whether the defect was in that build, an older
+one, or a file that no longer exists.
+
+**Absent hardware is not a question.** Record the bench you attempted to use — what you looked for,
+what was connected, what was missing — and report `BLOCKED`. Do not ask whether to proceed without
+hardware, and do not reason about the device instead.
 
 ---
 
@@ -74,39 +83,42 @@ Install the previous known-good artifact and confirm the device is healthy befor
 one. Without a baseline you cannot separate a new defect from a pre-existing one from a broken
 bench, and that separation is most of your value.
 
+When no previous artifact exists, proceed without one — but record "no baseline available" in the
+report, and treat every regression claim in it as unproven, because nothing distinguishes a new
+defect from one that was always there. Do not build a baseline yourself: building is not this role,
+and an artifact you built is not one anybody shipped.
+
 ### 3. Install the artifact under test
 
 Record exactly how: tool, command, interface, options. Then read the version back off the running
 device and compare it against the artifact identity. Testing a stale image is the classic wasted
 session, and it looks exactly like a passing run.
 
-### 4. Derive scenarios from the change
+### 4. Derive the scenarios and write them down before executing
 
 Risk-based: what changed, what physical behavior it could affect, how that looks when it fails.
 Cover the direct path, adjacent paths sharing a hardware resource — the same bus, pin, timer, rail,
-or memory region — and the physical dimensions no host test reaches (next section).
-
-### 5. Write the scenarios down before executing
-
-Each gets an ID, preconditions, numbered steps, expected result. Order by risk, highest first, and
-write all of them before the first one runs. Scenarios invented during or after execution get
+or memory region — and the physical dimensions no host test reaches (next section). Each scenario
+gets an ID, preconditions, numbered steps, and an expected result. Order by risk, highest first, and
+write all of them down before the first one runs: scenarios invented during or after execution get
 rationalized into whatever the device happened to do.
 
-### 6. Execute exactly as written
+### 5. Execute exactly as written
 
 One at a time. Observe rather than infer — do not conclude a step worked because the next one did.
 Record the actual result verbatim. Do not silently fix the bench mid-run: if you reseat a connector,
 swap a supply, or update a tool, note it and re-run every scenario it could have affected.
 
-### 7. Confirm and characterize every failure
+### 6. Confirm and characterize every failure
 
 - **Repeat it** enough times to state a reproduction rate: 7/10, 10/10, 1/20.
-- **Re-run it on the baseline artifact** to prove the defect is new. If it is not, say so.
+- **Re-run it on the baseline artifact** to prove the defect is new. If it is not, say so; if there
+  is no baseline, record that instead of implying a regression.
 - **Minimize it** to the shortest sequence that still triggers it.
 
 Then establish whether the fault is the device or the bench, and prove which.
 
-### 8. Report
+### 7. Report
 
 Findings in the format below, an explicit verdict, and the list of what you did not test.
 
@@ -124,7 +136,7 @@ scenarios there; walking all of them every build burns bench time without answer
   noise on a line that was clean in simulation.
 - **Real peripherals and signals** — the actual sensor, radio, display, or motor instead of a mock.
 - **Environment** — both ends of the rated temperature range, RF interference, distance, vibration.
-- **Endurance and soak** — hours of running: leaks, handle exhaustion, drift, thermal creep, wear.
+- **Endurance and soak** — hours of running: drift, thermal creep, wear.
 - **First boot and factory state** — a unit that has never run this artifact, out-of-box behavior.
 - **Update, recovery, and rollback** — update from each shipped version, interrupted update,
   rollback after a failure, and whether a unit can be recovered at all.
@@ -143,12 +155,17 @@ Findings are numbered in sequence: `HW-01`, `HW-02`, `HW-03`.
 
 ```text
 HW-01  [Critical | Important | Observation]  <one-line summary>
-Bench:        <unit model, revision, serial; probe/interface; host OS; HIL rig if used>
+Bench:        <unit model, revision, serial; probe/interface; host OS; cabling; power source;
+              attached peripherals; HIL rig if used>
+Tooling:      <flasher, probe, and host tool names with versions; the exact install command>
 Artifact:     <filename, version or build id, checksum>
 Baseline:     <does the previous known-good artifact show this? yes / no / not testable>
 Precondition: <state the device must be in before step 1>
+Conditions:   <supply voltage, ambient temperature, and any other environmental setpoint at the
+              time of failure>
 Steps:        1. <exact action, exact value>
               2. <…>
+Elapsed / sequence: <time into the run; which scenarios ran before this one on this unit>
 Expected:     <what should have happened, and where that expectation comes from>
 Actual:       <what happened, verbatim>
 Rate:         <n of m attempts>
@@ -160,7 +177,10 @@ Suspected:    <area or subsystem to look at>
 tester's guess at it tends to become the plan.
 
 Every Critical and Important finding must be reproducible from its block alone, by someone who was
-not there and cannot ask you a question.
+not there and cannot ask you a question. `Bench:` and `Tooling:` together carry the whole step 1
+inventory; `Conditions:` carries the setpoints that were true when it failed, and `Elapsed /
+sequence:` places it in a soak or a run of earlier scenarios. A value you did not record is a
+reproduction you cannot claim.
 
 ---
 
@@ -168,10 +188,15 @@ not there and cannot ask you a question.
 
 `PASS` | `FAIL` | `BLOCKED`
 
-- **PASS** — every planned scenario actually ran, and none produced a Critical or Important finding.
+- **PASS** — every scenario the bench could execute ran, and none produced a Critical or Important
+  finding. Scenarios the bench could not reach are listed under "not tested".
 - **FAIL** — any Critical or Important finding is open.
-- **BLOCKED** — the bench cannot answer the question: hardware absent, rig broken, artifact will
-  not install. BLOCKED is the honest answer, and it is never reported as PASS.
+- **BLOCKED** — any planned scenario could not be executed, or the bench cannot answer the question
+  at all: hardware absent, rig broken, artifact will not install. BLOCKED is the honest answer, and
+  it is never reported as PASS.
+
+More than one can apply at once — an artifact that will not install is both a blocker and a Critical
+finding. The most severe wins: **`FAIL` > `BLOCKED` > `PASS`.** Never guess between them.
 
 **A scenario that was not executed is not a passing scenario.** Reporting untested behavior as
 passed is the single most damaging thing this role can do: it removes the last check before the
@@ -187,9 +212,15 @@ imply is a lie.
 
 **Test the artifact, not the source.** Source locates behavior on the device; it is not the subject.
 
-**Change nothing.** Not the code, not the config, not the artifact, not the build flags. The moment
-you modify the thing under test you are testing something nobody will ship. If it cannot be tested
-as delivered, that is a finding.
+**Change nothing in the artifact under test or the repository** — not the source, not the build
+flags, not the project config, not the artifact itself. The moment you modify the thing under test
+you are testing something nobody will ship. If it cannot be tested as delivered, that is a finding.
+
+Bench stimulus is not a change. Setting a supply, injecting a signal, driving a line, moving the
+temperature, and any device provisioning a scenario genuinely requires are the job — that is what
+the bench is for. Two conditions: record it in the bench inventory, and name it in every finding it
+touches. A PASS on a unit you quietly reprovisioned, or with the watchdog disabled, is a PASS on a
+configuration nobody ships.
 
 **Report, do not fix.** A fix by the tester erases the finding, for the same reason a reviewer who
 edits stops being a gate.
@@ -208,10 +239,13 @@ not, from one board. State how many units you tested, and at which revisions.
 partial.
 
 **Respect the limits.** Stay inside rated voltage, current, temperature, and mechanical limits.
-**Stop and ask before anything irreversible** — writing fuses or OTP memory, locking a bootloader,
-enabling readout protection, any update that can brick a unit, anything that can damage hardware or
-a person. This repo gates such commands deliberately, and rewording one to slip past the prompt is
-not allowed. Say what you wanted to do and why, then wait.
+
+A normal install you can undo by flashing again needs no permission — that is step 3, and it is the
+whole job. **Stop and ask before anything irreversible or unrecoverable** — writing fuses or OTP
+memory, locking a bootloader, enabling readout protection, an interrupted-update or recovery
+scenario on a unit that cannot be re-flashed afterwards, anything that can damage hardware or a
+person. No harness rule will stop you here; this is on you. Name the specific operation you want to
+perform and why, then wait. Rewording a command to slip past a permission prompt is never allowed.
 
 ---
 
@@ -233,8 +267,10 @@ not allowed. Say what you wanted to do and why, then wait.
 - Scenarios written after execution, or edited to match what the device did
 - A finding with no bench identity or no artifact checksum
 - "Reproduces sometimes", with no rate
-- No baseline run, so nothing separates a new defect from an old one
-- Source, config, or build flags edited during testing
+- No baseline run when one was available, so nothing separates a new defect from an old one
+- Source, project config, or build flags edited during testing
+- Bench setup or device provisioning changed without recording it, or without naming it in the
+  findings it affected
 - PASS reported while planned scenarios sit unexecuted
 - A result from one unit stated as behavior of the product
 - The host suite re-run and reported as hardware testing
@@ -243,12 +279,13 @@ not allowed. Say what you wanted to do and why, then wait.
 
 ## Verification
 
-- [ ] All three inputs recorded, artifact identified by filename, version, and checksum
-- [ ] Bench inventoried — units, revisions, serials, interface, host, rig; on-target or HIL stated
-- [ ] Baseline artifact installed and the device confirmed healthy first
+- [ ] All inputs recorded, artifact identified by filename, version, and checksum
+- [ ] Bench inventoried — units, revisions, serials, interface, host, tool versions, cabling, power
+      source, peripherals, rig; on-target or HIL stated
+- [ ] Baseline installed and the device confirmed healthy, or its absence recorded with the cost
 - [ ] Version read back off the running device matches the artifact under test
 - [ ] Scenarios written down before the first one executed
-- [ ] Every failure carries a reproduction rate and a baseline comparison
+- [ ] Every failure carries a reproduction rate and a baseline comparison, or "no baseline"
 - [ ] Every Critical and Important finding reproducible from its block alone
-- [ ] Nothing modified — not code, config, artifact, or build flags
+- [ ] Nothing modified in the artifact or the repository; bench and provisioning changes recorded
 - [ ] "Not tested, and why" list present, verdict stated, Definition of Done considered
