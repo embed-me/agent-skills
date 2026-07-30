@@ -31,6 +31,7 @@ Task arrives
    ├─ Something is broken?                            ──→ test-driven-development
    │                                                       (reproduce it with a failing test first)
    ├─ Judging finished work?                          ──→ code-review-and-quality
+   ├─ Testing a build on real hardware?               ──→ hardware-test-execution
    └─ Committing, branching, tagging, releasing?      ──→ git-workflow-and-versioning
 ```
 
@@ -41,10 +42,14 @@ spec-driven-development
   → planning-and-task-breakdown
     → incremental-implementation + test-driven-development   (per task, repeated)
       → code-review-and-quality                              (per task, gate)
+      + hardware-test-execution                              (per artifact, gate, when hardware exists)
         → git-workflow-and-versioning                        (commit, tag, release)
 ```
 
 A bug fix usually runs only: `test-driven-development` → `code-review-and-quality`.
+
+`hardware-test-execution` covers real devices; `test-driven-development` owns the host-side
+automated suite.
 
 Not every task needs every skill. Every task needs *a decision* about which apply.
 

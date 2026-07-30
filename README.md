@@ -24,6 +24,7 @@ downward only; skills never invoke agents.** No layer reaches sideways or upward
       │                             │
   /planning  /build  /review     free-form
   /test  /code-simplify          message
+  /hwtest
       │                             │
       └──────────────┬──────────────┘
                      ▼
@@ -32,14 +33,14 @@ downward only; skills never invoke agents.** No layer reaches sideways or upward
         │  plans · delegates ·   │  cannot edit source
         │  sequences · integrates│
         └───────────┬────────────┘
-          ┌─────────┴─────────┬
-          ▼                   ▼
-    ┌───────────┐      ┌─────────────┐
-    │  BUILDER  │  ──▶ │CODE-REVIEWER│
-    │  edits    │  ◀── │  read-only  │
-    └───────────┘ REQUEST CHANGES
-          │              │
-          └──────┬───────┘
+          ┌─────────┴─────────┬─────────────────┐
+          ▼                   ▼                 ▼
+    ┌───────────┐      ┌─────────────┐  ┌───────────────┐
+    │  BUILDER  │  ──▶ │CODE-REVIEWER│  │HARDWARE-TESTER│
+    │  edits    │  ◀── │  read-only  │  │  read-only    │
+    └───────────┘ REQUEST CHANGES       └───────────────┘
+          │              │                      │
+          └──────┬───────┴──────────────────────┘
                  ▼
         skill tool → .opencode/skills/*/SKILL.md
                  │
@@ -60,6 +61,11 @@ the whole structure collapses into one agent doing everything in one context.
 of reporting it. The fix looks the same, but the finding vanishes — nobody learns the pattern,
 the author never sees the mistake, and there is no record. Read-only is what makes it a gate
 rather than a second author.
+
+**The hardware tester is its own read-only role.** A green suite proves the logic, not the
+device — clock skew, brownouts, a flash sector that only fails warm, and every timing assumption
+the host mocked away are invisible to it. And a tester that can edit will make the bench pass
+instead of reporting that it does not, which is the one failure mode that leaves no trace.
 
 **Builders cannot spawn subagents.** `permission.task: deny`, plus `subagent_depth: 1` globally.
 Recursive delegation produces work nobody is tracking and cost nobody predicted.
@@ -86,7 +92,11 @@ plan is the leverage point; that is where the capable model belongs.
 | VERIFY | `/test` | builder | `test-driven-development` | tests |
 | REVIEW | `/review` | code-reviewer | `code-review-and-quality` | verdict |
 | SIMPLIFY | `/code-simplify` | builder | — | smaller diff |
+| HARDWARE | `/hwtest` | hardware-tester | `hardware-test-execution` | findings + verdict |
 | SHIP | — | `/ship` | `git-workflow-and-versioning` | tag, changelog |
+
+HARDWARE gates the artifact that ships, so it sits after the last phase that can still change code
+— re-run it after any change to the artifact.
 
 Commands are shortcuts, not the only path. Plain English works too — the routing table in
 `AGENTS.md` and the `using-agent-skills` router cover the same ground without a slash.

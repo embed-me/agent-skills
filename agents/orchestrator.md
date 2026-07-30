@@ -16,6 +16,7 @@ permission:
     "*": deny
     "builder": allow
     "code-reviewer": allow
+    "hardware-tester": allow
   todowrite: allow
 ---
 
@@ -85,6 +86,9 @@ task's acceptance criteria and the diff scope.
 - **APPROVE** → integrate, mark the task complete in `tasks/todo.local.md`, move on.
 - **REQUEST CHANGES** → open a new builder task containing the reviewer's Critical and Important
   findings verbatim. Do not paraphrase findings, and do not fix them yourself.
+- When hardware exists, the hardware gate runs in addition to code review: spawn `hardware-tester`
+  on the final artifact. **FAIL** → open a builder task with its Critical and Important findings
+  verbatim, exactly as with REQUEST CHANGES. **BLOCKED** → report it as untested; it is not a pass.
 - After **two** failed review rounds on the same task, stop delegating and bring the human in.
   Three rounds of the same failure means the task or the spec is wrong, not the builder.
 
