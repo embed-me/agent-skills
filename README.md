@@ -91,10 +91,10 @@ plan is the leverage point; that is where the capable model belongs.
 | BUILD | `/build` | builder | `incremental-implementation` | code + commits |
 | VERIFY | `/test` | builder | `test-driven-development` | tests |
 | REVIEW | `/review` | code-reviewer | `code-review-and-quality` | verdict |
-| POST-PR | `/self-improvement` | builder | `self-improvement` | reflection + targeted guidance change + monitoring signal |
 | SIMPLIFY | `/code-simplify` | builder | — | smaller diff |
 | HARDWARE | `/hwtest` | hardware-tester | `hardware-test-execution` | findings + verdict |
 | SHIP | — | `/ship` | `git-workflow-and-versioning` | tag, changelog |
+| FEEDBACK | `/self-improvement` | builder | `self-improvement` | reflection + targeted guidance change + monitoring signal |
 
 HARDWARE gates the artifact that ships, so it sits after the last phase that can still change code
 — re-run it after any change to the artifact.
