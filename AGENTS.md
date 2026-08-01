@@ -5,6 +5,8 @@ Cursor, Copilot, Codex, Gemini CLI, …). This file is loaded automatically into
 
 Keep it short. Detail belongs in skills, not here.
 
+PLAN.md, plan.local.md, and similar artefacts are never part of the codebase; they are only for local agent memory and planning.
+
 ---
 
 ## 1. The skill contract
