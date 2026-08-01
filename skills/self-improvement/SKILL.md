@@ -1,18 +1,18 @@
 ---
 name: self-improvement
 description: >-
-  Turns completed PR and review evidence into small, monitored improvements to repository guidance.
-  Use manually after a PR is merged or fully completed.
+  Self-improvement at the end of a session when the work is fully completed and feedback was 
+  incorporated.
 license: MIT
 compatibility: opencode, claude-code, cursor, codex, any agent that can read a file
 metadata:
-  phase: post-pr
+  phase: feedback-incorporated
 ---
 
 # Self-Improvement
 
-Improve the way future work is done, not the finished PR itself. Use the completed PR, review
-comments, requested changes, test failures, and follow-up evidence as the input.
+Improve the way future work is done, not the finished work item itself. Use the completed PR, 
+review comments, requested changes, test failures, and follow-up evidence as the input.
 
 ## Process
 
@@ -23,16 +23,12 @@ comments, requested changes, test failures, and follow-up evidence as the input.
 3. **Choose the smallest prevention.** For a justified recurring pattern, formulate one concrete,
    testable improvement. Prefer a precise addition or correction to the relevant skill; edit
    `AGENTS.md` only when the rule is universal and belongs there.
-4. **Apply and record.** Make only the minimal justified edit. Do not perform broad cleanup,
-   unrelated refactoring, or overfit guidance to one PR. If no generalized action is justified,
-   record that decision and leave guidance unchanged.
-5. **Monitor.** Name where the signal is recorded, its review timing/cadence, and the evidence threshold
-   for recurrence or success (for example, the review finding recurs once or the new checklist is
-   used successfully in two subsequent changes). At that review, decide whether to keep, revise,
-   or remove the guidance.
-6. **Verify.** Before reporting completion, inspect `git diff` and `git status`; confirm that only
-   the justified skill or `AGENTS.md` changed, and validate that the resulting guidance is precise,
-   scoped, and consistent with this workflow.
+4. **Apply and record.** Make only the minimal justified edit to the skills- or instructions files. 
+   Do not perform broad cleanup, unrelated rephrasing, or overfit guidance based on one learning. 
+   If no generalized action is justified, record that decision and leave guidance unchanged.
+5. **Verify.** Before reporting completion, inspect and confirm that only the justified skill or 
+   `AGENTS.md` changed, and validate that the resulting guidance is precise, scoped, and consistent 
+   with this workflow.
 
 ## Output
 
