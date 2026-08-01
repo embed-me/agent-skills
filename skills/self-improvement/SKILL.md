@@ -26,11 +26,16 @@ comments, requested changes, test failures, and follow-up evidence as the input.
 4. **Apply and record.** Make only the minimal justified edit. Do not perform broad cleanup,
    unrelated refactoring, or overfit guidance to one PR. If no generalized action is justified,
    record that decision and leave guidance unchanged.
-5. **Monitor.** Name one meaningful signal to check in subsequent work (for example, recurrence of
-   the review finding or successful use of the new checklist). Revisit the change after enough
-   work has passed to keep, refine, or remove it based on evidence.
+5. **Monitor.** Name where the signal is recorded, its review timing/cadence, and the evidence threshold
+   for recurrence or success (for example, the review finding recurs once or the new checklist is
+   used successfully in two subsequent changes). At that review, decide whether to keep, revise,
+   or remove the guidance.
+6. **Verify.** Before reporting completion, inspect `git diff` and `git status`; confirm that only
+   the justified skill or `AGENTS.md` changed, and validate that the resulting guidance is precise,
+   scoped, and consistent with this workflow.
 
 ## Output
 
 Report the evidence reviewed, the reflection, the PR-specific/general classification, the action
-taken or declined, and the monitoring signal. Keep the result surgical and reversible.
+taken or declined, and the monitoring record/location, review timing, evidence threshold, and
+keep/revise/remove decision. Keep the result surgical and reversible.
