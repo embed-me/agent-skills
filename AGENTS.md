@@ -71,6 +71,9 @@ test that failed before your change and passes after, plus a green suite.
 
 **Leave the repo runnable.** Every commit builds and passes tests.
 
+**Testing.** Temporary directories must be created in the project directory NOT in external 
+directories like `/tmp/*` to align with project scope restrictions.
+
 ---
 
 ## 5. Definition of Done
